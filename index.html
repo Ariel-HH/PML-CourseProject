@@ -129,7 +129,7 @@ $(document).ready(function () {
 
 <div id="summary" class="section level2">
 <h2>Summary</h2>
-<p>We use data from accelerometers on the belt, forearm, arm, and dumbell of 6 participants. They were asked to perform barbell lifts correctly and incorrectly in 5 different ways. Our objective is to predict the manner in which they did the exercise (i.e., he “classe” variable in the data).</p>
+<p>We use data from accelerometers on the belt, forearm, arm, and dumbell of 6 participants. They were asked to perform barbell lifts correctly and incorrectly in 5 different ways. Our objective is to predict the manner in which they did the exercise (i.e., he <strong>classe</strong> variable in the data).</p>
 </div>
 <div id="reading-data" class="section level2">
 <h2>Reading data</h2>
@@ -156,7 +156,7 @@ c(anyNA(training), anyNA(testing))</code></pre>
 inTrain &lt;- createDataPartition(training$classe, p = .75, list = F)
 validation &lt;- training[-inTrain,]
 training &lt;- training[inTrain,]</code></pre>
-<p>We fit a classification tree (named: mdl1) plaining to use varImp function to filter the most influential variables. This first model makes us note that variable X (the order of the samples) is enough to predict the outcome (because the outcome is ordered!!).</p>
+<p>We fit a classification tree (named: <strong>mdl1</strong>) plaining to use varImp function to filter the most influential variables. This first model makes us note that variable <strong>X</strong> (the order of the samples) is enough to predict the outcome (because the outcome is ordered!!).</p>
 <pre class="r"><code>mdl1 &lt;- train(classe ~ ., method = &quot;rpart&quot;, data = training)
 mdl1$finalModel</code></pre>
 <pre><code>## n= 14718 
@@ -167,9 +167,9 @@ mdl1$finalModel</code></pre>
 ## 1) root 14718 10533 A (0.28 0.19 0.17 0.16 0.18)  
 ##   2) X&lt; 5580.5 4185     0 A (1 0 0 0 0) *
 ##   3) X&gt;=5580.5 10533  7685 B (0 0.27 0.24 0.23 0.26)  
-##     6) X&lt; 9377 2848     0 B (0 1 0 0 0) *
-##     7) X&gt;=9377 7685  4979 E (0 0 0.33 0.31 0.35) *</code></pre>
-<p>So we ignore X and fit a new classification tree (named: mdl2.) Finaly, we just keep the predictors signaled by varImp(mdl2).</p>
+##     6) X&lt; 9377.5 2848     0 B (0 1 0 0 0) *
+##     7) X&gt;=9377.5 7685  4979 E (0 0 0.33 0.31 0.35) *</code></pre>
+<p>So we ignore X and fit a new classification tree (named: <strong>mdl2</strong>) Finaly, we just keep the predictors signaled by <strong>varImp(mdl2)</strong>.</p>
 <pre class="r"><code>mdl2 &lt;- train(classe ~ ., method = &quot;rpart&quot;, data = training[,-1])
 impList2 &lt;- varImp(mdl2)
 # names of influential variables (or levels of factor variables)
@@ -183,12 +183,12 @@ testing &lt;- testing[, finalvarsIndex]</code></pre>
 </div>
 <div id="constructing-our-final-models" class="section level2">
 <h2>Constructing our final models</h2>
-<p>First we fit three models (using methods: gbm, rf, and lda) on the training data. We measure the out of sample error of each model and the blending of the three. The results are that the first two models have excellent accuracy, leaving almost no room for improvements made with the blending.</p>
+<p>First we fit three models (using methods: <strong>gbm</strong>, <strong>rf</strong>, and <strong>lda</strong>) on the training data. We measure the out of sample error of each model and the blending of the three. The results are that the first two models have excellent accuracy, leaving almost no room for improvements made with the blending.</p>
 <pre class="r"><code>library(gbm)
 gbmmdl &lt;- train(classe ~ ., data = training, method = &quot;gbm&quot;, verbose = F,
-                trControl = trainControl(method = &quot;cv&quot;, number = 2))
+                trControl = trainControl(method = &quot;cv&quot;, number = 3))
 rfmdl &lt;- train(classe ~ ., data = training, method = &quot;rf&quot;,
-               trControl = trainControl(method = &quot;cv&quot;, number = 2))
+               trControl = trainControl(method = &quot;cv&quot;, number = 3))
 ldamdl &lt;-  train(classe ~ ., method = &quot;lda&quot;, data = training)
 # to make the blending of the three models
 predDF &lt;- data.frame(predict(rfmdl, validation), 
@@ -202,15 +202,15 @@ combPred &lt;- predict(combModFit,predDF)
 # showing accuracy of the three models
 for(i in 1:3) print(confusionMatrix(validation$classe, predDF[,i])[[3]])</code></pre>
 <pre><code>##       Accuracy          Kappa  AccuracyLower  AccuracyUpper   AccuracyNull 
-##      1.0000000      1.0000000      0.9992481      1.0000000      0.2844617 
+##      0.9997961      0.9997421      0.9988644      0.9999948      0.2844617 
 ## AccuracyPValue  McnemarPValue 
 ##      0.0000000            NaN 
 ##       Accuracy          Kappa  AccuracyLower  AccuracyUpper   AccuracyNull 
-##      0.9951060      0.9938108      0.9927269      0.9968619      0.2834421 
+##      0.9971452      0.9963891      0.9952147      0.9984384      0.2846656 
 ## AccuracyPValue  McnemarPValue 
 ##      0.0000000            NaN 
 ##       Accuracy          Kappa  AccuracyLower  AccuracyUpper   AccuracyNull 
-##      0.7222675      0.6496207      0.7095005      0.7347695      0.2679445 
+##      0.7730424      0.7133531      0.7610566      0.7847023      0.2754894 
 ## AccuracyPValue  McnemarPValue 
 ##      0.0000000            NaN</code></pre>
 <pre class="r"><code># showing accuracy of blended model
@@ -222,11 +222,15 @@ confusionMatrix(validation$classe, combPred)[[3]]</code></pre>
 </div>
 <div id="predicting-on-the-test-data" class="section level2">
 <h2>Predicting on the Test data</h2>
-<p>Finally, we predict the outcome on the test data. As the first two models agree perfectly on the prediction it is not necessary to use the third model (our original idea was to use majority vote to obtain the prediction on the test data). Each of rfpred and gbmpred variables will provide our answer to the Quiz portion of the course project. Note that we did not re-trained our models merging training and validation data, this is because the accuracy obtained with the training data was large enough.</p>
+<p>Finally, we predict the outcome on the test data. As the first two models agree perfectly on the prediction it is not necessary to use the third model (our original idea was to use majority vote to obtain the prediction on the test data). Any of <strong>rfpred</strong> and <strong>gbmpred</strong> predictions will provide our answer to the Quiz portion of the course project.</p>
 <pre class="r"><code>rfpred &lt;- predict(rfmdl, testing)
 gbmpred &lt;- predict(gbmmdl, testing)
 any(rfpred != gbmpred)</code></pre>
 <pre><code>## [1] FALSE</code></pre>
+</div>
+<div id="final-observations" class="section level2">
+<h2>Final observations</h2>
+<p>Note that we did not re-trained our models merging training and validation data, this is because the accuracy obtained with the training data was large enough. For the same reason we didn’t performed any preprocessing, creation of new predictors, or any kind of tuning of our models to improve prediction accuracy.</p>
 </div>
 
 

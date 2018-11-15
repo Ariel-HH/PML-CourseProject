@@ -1,15 +1,16 @@
 ---
 title: "PML-CourseProject"
 author: "Ariel"
-documentclass: article
-output: html_document
+output:
+  html_document: default
+  pdf_document: default
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = T, message = F, warning = F)
 ```
 ## Summary
-We use data from accelerometers on the belt, forearm, arm, and dumbell of 6 participants. They were asked to perform barbell lifts correctly and incorrectly in 5 different ways. Our objective is to predict the manner in which they did the exercise (i.e., he "classe" variable in the data).
+We use data from accelerometers on the belt, forearm, arm, and dumbell of 6 participants. They were asked to perform barbell lifts correctly and incorrectly in 5 different ways. Our objective is to predict the manner in which they did the exercise (i.e., he **classe** variable in the data).
 
 ## Reading data
 ```{r }
@@ -40,13 +41,13 @@ validation <- training[-inTrain,]
 training <- training[inTrain,]
 ```
 
-We fit a classification tree (named: mdl1) plaining to use varImp function to filter the most influential variables. This first model makes us note that variable X (the order of the samples) is enough to predict the outcome (because the outcome is ordered!!).
+We fit a classification tree (named: **mdl1**) plaining to use varImp function to filter the most influential variables. This first model makes us note that variable **X** (the order of the samples) is enough to predict the outcome (because the outcome is ordered!!).
 ```{r}
 mdl1 <- train(classe ~ ., method = "rpart", data = training)
 mdl1$finalModel
 ```
 
-So we ignore X and fit a new classification tree (named: mdl2.) Finaly, we just keep the predictors signaled by varImp(mdl2).
+So we ignore X and fit a new classification tree (named: **mdl2**) Finaly, we just keep the predictors signaled by **varImp(mdl2)**.
 ```{r}
 mdl2 <- train(classe ~ ., method = "rpart", data = training[,-1])
 impList2 <- varImp(mdl2)
@@ -61,13 +62,13 @@ testing <- testing[, finalvarsIndex]
 ```
 
 ## Constructing our final models
-First we fit three models (using methods: gbm, rf, and lda) on the training data. We measure the out of sample error of each model and the blending of the three. The results are that the first two models have excellent accuracy, leaving almost no room for improvements made with the blending.
-```{r cache = T}
+First we fit three models (using methods: **gbm**, **rf**, and **lda**) on the training data. We measure the out of sample error of each model and the blending of the three. The results are that the first two models have excellent accuracy, leaving almost no room for improvements made with the blending.
+```{r}
 library(gbm)
 gbmmdl <- train(classe ~ ., data = training, method = "gbm", verbose = F,
-                trControl = trainControl(method = "cv", number = 2))
+                trControl = trainControl(method = "cv", number = 3))
 rfmdl <- train(classe ~ ., data = training, method = "rf",
-               trControl = trainControl(method = "cv", number = 2))
+               trControl = trainControl(method = "cv", number = 3))
 ldamdl <-  train(classe ~ ., method = "lda", data = training)
 # to make the blending of the three models
 predDF <- data.frame(predict(rfmdl, validation), 
@@ -87,14 +88,15 @@ confusionMatrix(validation$classe, combPred)[[3]]
 ```
 
 ## Predicting on the Test data
-Finally, we predict the outcome on the test data. As the first two models agree perfectly on the prediction it is not necessary to use the third model (our original idea was to use majority vote to obtain the prediction on the test data). Each of rfpred and gbmpred variables will provide our answer to the Quiz portion of the course project. Note that we did not re-trained our models merging training and validation data, this is because the accuracy obtained with the training data was large enough.
+Finally, we predict the outcome on the test data. As the first two models agree perfectly on the prediction it is not necessary to use the third model (our original idea was to use majority vote to obtain the prediction on the test data). Any of **rfpred** and **gbmpred** predictions will provide our answer to the Quiz portion of the course project.
 ```{r }
 rfpred <- predict(rfmdl, testing)
 gbmpred <- predict(gbmmdl, testing)
 any(rfpred != gbmpred)
 ```
 
-
+## Final observations
+Note that we did not re-trained our models merging training and validation data, this is because the accuracy obtained with the training data was large enough. For the same reason we didn't performed any preprocessing, creation of new predictors, or any kind of tuning of our models to improve prediction accuracy.
 
 
 
