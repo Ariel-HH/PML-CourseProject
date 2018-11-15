@@ -165,8 +165,8 @@ mdl1$finalModel</code></pre>
 ##       * denotes terminal node
 ## 
 ## 1) root 14718 10533 A (0.28 0.19 0.17 0.16 0.18)  
-##   2) X&lt; 5581 4185     0 A (1 0 0 0 0) *
-##   3) X&gt;=5581 10533  7685 B (0 0.27 0.24 0.23 0.26)  
+##   2) X&lt; 5580.5 4185     0 A (1 0 0 0 0) *
+##   3) X&gt;=5580.5 10533  7685 B (0 0.27 0.24 0.23 0.26)  
 ##     6) X&lt; 9377.5 2848     0 B (0 1 0 0 0) *
 ##     7) X&gt;=9377.5 7685  4979 E (0 0 0.33 0.31 0.35) *</code></pre>
 <p>So we ignore X and fit a new classification tree (named: mdl2.) Finaly, we just keep the predictors signaled by varImp(mdl2).</p>
@@ -202,21 +202,21 @@ combPred &lt;- predict(combModFit,predDF)
 # showing accuracy of the three models
 for(i in 1:3) print(confusionMatrix(validation$classe, predDF[,i])[[3]])</code></pre>
 <pre><code>##       Accuracy          Kappa  AccuracyLower  AccuracyUpper   AccuracyNull 
-##      0.9989804      0.9987103      0.9976223      0.9996689      0.2848695 
+##      0.9987765      0.9984524      0.9973389      0.9995509      0.2846656 
 ## AccuracyPValue  McnemarPValue 
 ##      0.0000000            NaN 
 ##       Accuracy          Kappa  AccuracyLower  AccuracyUpper   AccuracyNull 
-##      0.9940865      0.9925202      0.9915181      0.9960361      0.2846656 
+##      0.9961256      0.9950996      0.9939562      0.9976658      0.2844617 
 ## AccuracyPValue  McnemarPValue 
 ##      0.0000000            NaN 
 ##       Accuracy          Kappa  AccuracyLower  AccuracyUpper   AccuracyNull 
-##      0.7636623      0.7013778      0.7515152      0.7754948      0.2811990 
+##      0.7726346      0.7129080      0.7606416      0.7843022      0.2720228 
 ## AccuracyPValue  McnemarPValue 
 ##      0.0000000            NaN</code></pre>
 <pre class="r"><code># showing accuracy of blended model
 confusionMatrix(validation$classe, combPred)[[3]]</code></pre>
 <pre><code>##       Accuracy          Kappa  AccuracyLower  AccuracyUpper   AccuracyNull 
-##      0.9993883      0.9992262      0.9982133      0.9998738      0.2844617 
+##      0.9987765      0.9984524      0.9973389      0.9995509      0.2846656 
 ## AccuracyPValue  McnemarPValue 
 ##      0.0000000            NaN</code></pre>
 </div>
